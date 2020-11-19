@@ -18,15 +18,18 @@ module Sprockets
           config = app.config.assets
 
           # If Application Assets Digests enabled - Add Digest
-          webp_file = webp_file_by_config(config, data)
+          digested_webp_file = webp_file_by_config(true, data)
+          webp_file = webp_file_by_config(false, data)
 
           # WebP File Pathname
+          digested_webp_path = Pathname.new File.join(app.root, 'public', config.prefix, digested_webp_file)
           webp_path = Pathname.new File.join(app.root, 'public', config.prefix, webp_file)
 
           # Create Directory for both Files, unless already exists
           FileUtils.mkdir_p(webp_path.dirname) unless Dir.exists?(webp_path.dirname)
 
           # encode to webp
+          encode_to_webp(data, digested_webp_path.to_path, digested_webp_file)
           encode_to_webp(data, webp_path.to_path, webp_file)
 
           data
@@ -34,8 +37,8 @@ module Sprockets
 
         private
 
-        def webp_file_by_config(config, data)
-          digest    = config.digest ? "-#{context.environment.digest_class.new.update(data).to_s}" : nil
+        def webp_file_by_config(use_digest, data)
+          digest    = use_digest ? "-#{context.environment.digest_class.new.update(data).to_s}" : nil
           file_name = context.logical_path # Original File name w/o extension
           file_ext  = context.pathname.extname # Original File extension
           "#{file_name}#{digest}#{file_ext}.webp" # WebP File fullname

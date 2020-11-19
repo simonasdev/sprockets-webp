@@ -54,6 +54,7 @@ module Sprockets
               options = options.call(file.path) if options.respond_to?(:call)
               
               Sprockets::WebP.encoder.encode(file.path, webp_path, options)
+              
               logger.info "Webp converted image #{webp_path}"
             rescue => e
               logger.warn "Webp convertion error of image #{webp_file}. Error info: #{e.message}"

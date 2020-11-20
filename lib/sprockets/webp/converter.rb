@@ -29,8 +29,8 @@ module Sprockets
           FileUtils.mkdir_p(webp_path.dirname) unless Dir.exists?(webp_path.dirname)
 
           # encode to webp
-          encode_to_webp(data, digested_webp_path.to_path, digested_webp_file)
-          encode_to_webp(data, webp_path.to_path, webp_file)
+          encode_to_webp(context.pathname, data, digested_webp_path.to_path, digested_webp_file)
+          encode_to_webp(context.pathname, data, webp_path.to_path, webp_file)
 
           data
         end
@@ -44,7 +44,7 @@ module Sprockets
           "#{file_name}#{digest}#{file_ext}.webp" # WebP File fullname
         end
 
-        def encode_to_webp(data, webp_path, webp_file = "")
+        def encode_to_webp(input_path, data, webp_path, webp_file = "")
           # Create Temp File with Original File binary data
           Tempfile.open('webp') do |file|
             file.binmode
@@ -54,7 +54,7 @@ module Sprockets
             # Encode Original File Temp copy to WebP File Pathname
             begin
               options = Sprockets::WebP.encode_options
-              options = options.call(file.path) if options.respond_to?(:call)
+              options = options.call(input_path) if options.respond_to?(:call)
               
               Sprockets::WebP.encoder.encode(file.path, webp_path, options)
               
